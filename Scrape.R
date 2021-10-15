@@ -5,14 +5,14 @@ library(lubridate)
 library(xts)
 
 
-link <- read_html("https://www.indexmundi.com/commodities/?commodity=aluminum&months=360")
+link <- read_html("https://www.indexmundi.com/commodities/?commodity=gold&months=360")
 
 txt <- link %>%
   html_nodes(xpath = '//*[@id="gvPrices"]') %>%
   html_text() 
 
-aluv <- txt %>%
-  str_extract_all("[0-9],[0-9]{2,}\\.[0-9]{2}") %>%
+value <- txt %>%
+  str_extract_all("([0-9],)?[0-9]{3}\\.[0-9]{2}") %>%
   unlist() %>%
   str_remove_all(",") %>%
   as.numeric()
@@ -23,10 +23,13 @@ indx <- txt %>%
   str_to_lower() %>%
   parse_date_time(order = "b Y")
 
-dat <- xts(aluv, order.by = indx)
+dat <- xts(value, order.by = indx)
 
 colnames(dat) <- "price"
+
+dat2006 <- dat["2006-01-01/2021-08-01"]
 
 dat$logreturn <- diff(log(dat$price))
 
 dat$perctreturn <- (exp(dat$logreturn)-1)*100
+
