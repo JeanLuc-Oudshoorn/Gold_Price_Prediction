@@ -3,7 +3,7 @@ library(tsbox)
 
 
 #Finding the best ARIMA model
-acf2(dat$diff)
+acf2(diff(log(dat$price)))
 
 grid <- expand.grid(p = 0:3, d = 1:3, q = 0:3)
 grid$aic <- rep(0, nrow(grid)) 
@@ -12,7 +12,7 @@ models <- list()
 
 
 for (i in 1:nrow(grid)){
-  out <- sarima(dat$price, p = grid$p[i], d = grid$d[i], q = grid$q[i])
+  out <- sarima(log(dat$price), p = grid$p[i], d = grid$d[i], q = grid$q[i])
   grid$aic[i] <- out$AIC
   grid$bic[i] <- out$BIC
   models[[i]] <- out$ttable
@@ -24,14 +24,14 @@ result2 <- grid[order(grid$bic),]
 models[[as.numeric(rownames(head(result,1)))]]
 models[[as.numeric(rownames(tail(head(result,2),1)))]]
 
-acf2(diff(dat2006))
+acf2(diff(log(dat2006)))
 
 grid$aic2006 <- rep(0, nrow(grid)) 
 grid$bic2006 <- rep(0, nrow(grid))
 models2006 <- list()
 
 for (i in 1:nrow(grid)){
-  out <- sarima(dat2006$price, p = grid$p[i], d = grid$d[i], q = grid$q[i])
+  out <- sarima(log(dat2006$price), p = grid$p[i], d = grid$d[i], q = grid$q[i])
   grid$aic2006[i] <- out$AIC
   grid$bic2006[i] <- out$BIC
   models2006[[i]] <- out$ttable
